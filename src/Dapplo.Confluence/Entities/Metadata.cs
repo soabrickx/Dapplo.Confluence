@@ -24,5 +24,11 @@ namespace Dapplo.Confluence.Entities
         /// </summary>
         [JsonProperty("mediaType", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string MediaType { get; set; }
+        
+        /// <summary>
+        ///     Labels associated to content
+        /// </summary>
+        [JsonProperty("labels", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public Result<Label> Labels { get; set; }
     }
 }
