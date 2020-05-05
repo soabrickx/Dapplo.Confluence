@@ -145,17 +145,31 @@ namespace Dapplo.Confluence.Tests
             var bitmap = await _confluenceClient.Attachment.GetContentAsync<Bitmap>(attachment);
             Assert.True(bitmap.Width > 0);
         }
-        
+
         [Fact]
         public async Task TestSearchLabels()
         {
+            var searchResult = await _confluenceClient.Content.SearchAsync(Where.And(Where.Type.IsPage, Where.Text.Contains("Test Home")), limit: 1);
+            var contentId = searchResult.First().Id;
+
+            var labels = new[] { "test1", "test2" };
+            await _confluenceClient.Content.AddLabelsAsync(contentId, labels.Select(s => new Label { Name = s }));
+
             ConfluenceClientConfig.ExpandSearch = new[] { "version", "space", "space.icon", "space.description", "space.homepage", "history.lastUpdated", "metadata.labels" };
 
-            var searchResult = await _confluenceClient.Content.SearchAsync(Where.And(Where.Type.IsPage, Where.Text.Contains("Test Home")), limit: 1);
-            Assert.NotEmpty(searchResult.First().Metadata.Labels.Results);
+            searchResult = await _confluenceClient.Content.SearchAsync(Where.And(Where.Type.IsPage, Where.Text.Contains("Test Home")), limit: 1);
+            var labelEntities = searchResult.First().Metadata.Labels.Results;
+
+            Assert.NotEmpty(labelEntities);
+
+            // Delete all
+            foreach (var label in labelEntities)
+            {
+                await _confluenceClient.Content.DeleteLabelAsync(contentId, label.Name);
+            }
         }
 
-        //[Fact]
+        [Fact]
         public async Task TestLabels()
         {
             var searchResult = await _confluenceClient.Content.SearchAsync(Where.And(Where.Type.IsPage, Where.Text.Contains("Test Home")), limit: 1);
