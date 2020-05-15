@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,7 +39,7 @@ namespace Dapplo.Confluence
         }
 
         /// <summary>
-        ///     Get currrent user information, introduced with 6.6
+        ///     Get current user information, introduced with 6.6
         ///     See: https://docs.atlassian.com/confluence/REST/latest/#user-getCurrent
         /// </summary>
         /// <param name="confluenceClient">IUserDomain to bind the extension method to</param>
@@ -55,18 +55,22 @@ namespace Dapplo.Confluence
         }
 
         /// <summary>
-        ///     Get the groups for a user
+        ///     Get user information, introduced with 6.6
+        ///     See: https://docs.atlassian.com/confluence/REST/latest/#user-getUser
         /// </summary>
         /// <param name="confluenceClient">IUserDomain to bind the extension method to</param>
         /// <param name="username">string with username</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>List with Groups</returns>
-        public static async Task<IList<Group>> GetGroupsAsync(this IUserDomain confluenceClient, string username, CancellationToken cancellationToken = default)
+        /// <returns>User</returns>
+        [Obsolete("Username is deprecated, see: https://developer.atlassian.com/cloud/confluence/deprecation-notice-user-privacy-api-migration-guide/")]
+        public static async Task<User> GetUserAsync(this IUserDomain confluenceClient, string username, CancellationToken cancellationToken = default)
         {
-            var groupUri = confluenceClient.ConfluenceApiUri.AppendSegments("user", "memberof").ExtendQuery("username", username);
+            var userUri = confluenceClient.ConfluenceApiUri
+                .AppendSegments("user")
+                .ExtendQuery("username", username);
             confluenceClient.Behaviour.MakeCurrent();
-            var response = await groupUri.GetAsAsync<HttpResponse<Result<Group>, Error>>(cancellationToken).ConfigureAwait(false);
-            return response.HandleErrors()?.Results;
+            var response = await userUri.GetAsAsync<HttpResponse<User, Error>>(cancellationToken).ConfigureAwait(false);
+            return response.HandleErrors();
         }
 
         /// <summary>
@@ -74,15 +78,34 @@ namespace Dapplo.Confluence
         ///     See: https://docs.atlassian.com/confluence/REST/latest/#user-getUser
         /// </summary>
         /// <param name="confluenceClient">IUserDomain to bind the extension method to</param>
-        /// <param name="username">string with username</param>
+        /// <param name="accountIdHolder">IAccountIdHolder</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <returns>user information</returns>
-        public static async Task<User> GetUserAsync(this IUserDomain confluenceClient, string username, CancellationToken cancellationToken = default)
+        /// <returns>User</returns>
+        public static async Task<User> GetUserAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, CancellationToken cancellationToken = default)
         {
-            var userUri = confluenceClient.ConfluenceApiUri.AppendSegments("user").ExtendQuery("username", username);
+            var userUri = confluenceClient.ConfluenceApiUri
+                .AppendSegments("user")
+                .ExtendQuery("accountId", accountIdHolder.AccountId);
             confluenceClient.Behaviour.MakeCurrent();
             var response = await userUri.GetAsAsync<HttpResponse<User, Error>>(cancellationToken).ConfigureAwait(false);
             return response.HandleErrors();
+        }
+
+        /// <summary>
+        ///     Get the groups a user is member of
+        /// </summary>
+        /// <param name="confluenceClient">IUserDomain to bind the extension method to</param>
+        /// <param name="accountIdHolder">IAccountIdHolder</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>List with Groups</returns>
+        public static async Task<IList<Group>> GetGroupsAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, CancellationToken cancellationToken = default)
+        {
+            var groupUri = confluenceClient.ConfluenceApiUri
+                .AppendSegments("user", "memberof")
+                .ExtendQuery("accountId", accountIdHolder.AccountId);
+            confluenceClient.Behaviour.MakeCurrent();
+            var response = await groupUri.GetAsAsync<HttpResponse<Result<Group>, Error>>(cancellationToken).ConfigureAwait(false);
+            return response.HandleErrors()?.Results;
         }
     }
 }

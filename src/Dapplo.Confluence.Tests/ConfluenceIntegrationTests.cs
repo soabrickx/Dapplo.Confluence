@@ -1,0 +1,38 @@
+﻿// Copyright (c) Dapplo and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
+using System.Diagnostics;
+using Dapplo.Log;
+using Dapplo.Log.XUnit;
+using Xunit.Abstractions;
+
+namespace Dapplo.Confluence.Tests
+{
+    /// <summary>
+    ///     Base class for integration tests
+    /// </summary>
+    public abstract class ConfluenceIntegrationTests
+    {
+
+        // Test against a "well known" Confluence
+        private static readonly Uri TestConfluenceUri = new Uri("https://greenshot.atlassian.net/wiki");
+
+        protected readonly IConfluenceClient ConfluenceTestClient;
+
+        public ConfluenceIntegrationTests(ITestOutputHelper testOutputHelper)
+        {
+            LogSettings.ExceptionToStacktrace = exception => exception.ToStringDemystified();
+
+            LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
+            ConfluenceTestClient = Confluence.ConfluenceClient.Create(TestConfluenceUri);
+
+            var username = Environment.GetEnvironmentVariable("confluence_test_username");
+            var password = Environment.GetEnvironmentVariable("confluence_test_password");
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                ConfluenceTestClient.SetBasicAuthentication(username, password);
+            }
+        }
+    }
+}

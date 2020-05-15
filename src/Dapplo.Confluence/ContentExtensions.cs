@@ -104,7 +104,7 @@ namespace Dapplo.Confluence
         /// </summary>
         /// <param name="confluenceClient">IContentDomain to bind the extension method to</param>
         /// <param name="contentId">ID for the content which needs to be deleted</param>
-        /// <param name="isTrashed">If the content is trashable, you will need to call DeleteAsyc twice, second time with isTrashed = true</param>
+        /// <param name="isTrashed">If the content is trash-able, you will need to call DeleteAsync twice, second time with isTrashed = true</param>
         /// <param name="cancellationToken">CancellationToken</param>
         public static async Task DeleteAsync(this IContentDomain confluenceClient, long contentId, bool isTrashed = false, CancellationToken cancellationToken = default)
         {
@@ -194,22 +194,21 @@ namespace Dapplo.Confluence
         /// <param name="confluenceClient">IContentDomain to bind the extension method to</param>
         /// <param name="contentId">content id</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        /// <param name="start">int specifying where to start, used for paging.</param>
-        /// <param name="limit">int used to limit the amount of results, used for paging.</param>
+        /// <param name="pagingInformation">PagingInformation</param>
         /// <param name="parentVersion">int representing the version of the content to retrieve children for.</param>
         /// <returns>List with Content</returns>
-        public static async Task<Result<Content>> GetChildrenAsync(this IContentDomain confluenceClient, long contentId, int? start = null, int? limit = null, int? parentVersion = null, CancellationToken cancellationToken = default)
+        public static async Task<Result<Content>> GetChildrenAsync(this IContentDomain confluenceClient, long contentId, PagingInformation pagingInformation = null, int? parentVersion = null, CancellationToken cancellationToken = default)
         {
             var contentUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId, "child", "page");
 
-            if (start.HasValue)
+            if (pagingInformation?.Start != null)
             {
-                contentUri = contentUri.ExtendQuery("start", start);
+                contentUri = contentUri.ExtendQuery("start", pagingInformation.Start);
             }
 
-            if (limit.HasValue)
+            if (pagingInformation?.Limit != null)
             {
-                contentUri = contentUri.ExtendQuery("limit", limit);
+                contentUri = contentUri.ExtendQuery("limit", pagingInformation.Limit);
             }
 
             if (parentVersion.HasValue)
@@ -251,18 +250,33 @@ namespace Dapplo.Confluence
         ///     <a href="https://docs.atlassian.com/confluence/REST/latest/#d2e4539">here</a>
         /// </summary>
         /// <param name="confluenceClient">IContentDomain to bind the extension method to</param>
-        /// <param name="cqlClause">Confluence Query Language clause, created via Where</param>
+        /// <param name="cqlClause">Confluence Query Language, like SQL, for the search</param>
         /// <param name="cqlContext">
         ///     the execution context for CQL functions, provides current space key and content id. If this is
         ///     not provided some CQL functions will not be available.
         /// </param>
-        /// <param name="limit">Maximum number of results returned, default is 20</param>
+        /// <param name="pagingInformation">PagingInformation</param>
         /// <param name="expandSearch">The expand value for the search, when null the value from the ConfluenceClientConfig.ExpandSearch is taken</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>Result with content items</returns>
-        public static Task<Result<Content>> SearchAsync(this IContentDomain confluenceClient, IFinalClause cqlClause, string cqlContext = null, int limit = 20, IEnumerable<string> expandSearch = null, CancellationToken cancellationToken = default)
+        public static Task<Result<Content>> SearchAsync(this IContentDomain confluenceClient, IFinalClause cqlClause, string cqlContext = null, PagingInformation pagingInformation = null, IEnumerable<string> expandSearch = null,
+            CancellationToken cancellationToken = default)
         {
-            return confluenceClient.SearchAsync(cqlClause.ToString(), cqlContext, limit, expandSearch, cancellationToken);
+            var searchDetails = new SearchDetails(cqlClause)
+            {
+                Start = pagingInformation?.Start,
+                Limit = pagingInformation?.Limit
+            };
+
+            if (cqlContext != null)
+            {
+                searchDetails.CqlContext = cqlContext;
+            }
+            if (expandSearch != null)
+            {
+                searchDetails.ExpandSearch = expandSearch;
+            }
+            return confluenceClient.SearchAsync(searchDetails, cancellationToken);
         }
 
         /// <summary>
@@ -271,30 +285,33 @@ namespace Dapplo.Confluence
         ///     <a href="https://docs.atlassian.com/confluence/REST/latest/#d2e4539">here</a>
         /// </summary>
         /// <param name="confluenceClient">IContentDomain to bind the extension method to</param>
-        /// <param name="cql">Confluence Query Language, like SQL, for the search</param>
-        /// <param name="cqlContext">
-        ///     the execution context for CQL functions, provides current space key and content id. If this is
-        ///     not provided some CQL functions will not be available.
-        /// </param>
-        /// <param name="limit">Maximum number of results returned, default is 20</param>
-        /// <param name="expandSearch">The expand value for the search, when null the value from the ConfluenceClientConfig.ExpandSearch is taken</param>
+        /// <param name="searchDetails">All the details needed for a search</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>Result with content items</returns>
-        public static async Task<Result<Content>> SearchAsync(this IContentDomain confluenceClient, string cql, string cqlContext = null, int limit = 20, IEnumerable<string> expandSearch = null, CancellationToken cancellationToken = default)
+        public static async Task<Result<Content>> SearchAsync(this IContentDomain confluenceClient, SearchDetails searchDetails, CancellationToken cancellationToken = default)
         {
             confluenceClient.Behaviour.MakeCurrent();
 
-            var searchUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", "search").ExtendQuery("cql", cql).ExtendQuery("limit", limit);
+            var searchUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", "search").ExtendQuery("cql", searchDetails.Cql);
 
-            var expand = string.Join(",", expandSearch ?? ConfluenceClientConfig.ExpandSearch ?? Enumerable.Empty<string>());
+            if (searchDetails.Limit.HasValue)
+            {
+                searchUri = searchUri.ExtendQuery("limit", searchDetails.Limit);
+            }
+            if (searchDetails.Start.HasValue)
+            {
+                searchUri = searchUri.ExtendQuery("start", searchDetails.Start);
+            }
+
+            var expand = string.Join(",", searchDetails.ExpandSearch ?? ConfluenceClientConfig.ExpandSearch ?? Enumerable.Empty<string>());
             if (!string.IsNullOrEmpty(expand))
             {
                 searchUri = searchUri.ExtendQuery("expand", expand);
             }
 
-            if (cqlContext != null)
+            if (searchDetails.CqlContext != null)
             {
-                searchUri = searchUri.ExtendQuery("cqlcontext", cqlContext);
+                searchUri = searchUri.ExtendQuery("cqlcontext", searchDetails.CqlContext);
             }
 
             var response = await searchUri.GetAsAsync<HttpResponse<Result<Content>, Error>>(cancellationToken).ConfigureAwait(false);

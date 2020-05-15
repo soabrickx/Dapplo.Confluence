@@ -13,14 +13,8 @@ namespace Dapplo.Confluence.Entities
     ///     See: https://docs.atlassian.com/confluence/REST/latest
     /// </summary>
     [JsonObject]
-    public class Result<TResult> : IEnumerable<TResult>
+    public class Result<TResult> : PagingInformation, IEnumerable<TResult>
     {
-        /// <summary>
-        ///     The result is limited by
-        /// </summary>
-        [JsonProperty("limit", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public int Limit { get; set; }
-
         /// <summary>
         ///     Different links for this entity, depending on the entry
         /// </summary>
@@ -38,12 +32,6 @@ namespace Dapplo.Confluence.Entities
         /// </summary>
         [JsonProperty("size", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public int Size { get; set; }
-
-        /// <summary>
-        ///     The start of the elements, this is used for paging
-        /// </summary>
-        [JsonProperty("start", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public int Start { get; set; }
 
         /// <summary>
         /// Returns if there are more results as requested
