@@ -92,17 +92,34 @@ namespace Dapplo.Confluence
         }
 
         /// <summary>
-        ///     Get the groups a user is member of
+        ///  Get groups for the specified user, introduced with 6.6
+        ///     See: https://developer.atlassian.com/cloud/confluence/rest/#api-api-user-memberof-get
         /// </summary>
         /// <param name="confluenceClient">IUserDomain to bind the extension method to</param>
         /// <param name="accountIdHolder">IAccountIdHolder</param>
+        /// <param name="pagingInformation">PagingInformation</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>List with Groups</returns>
-        public static async Task<IList<Group>> GetGroupsAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, CancellationToken cancellationToken = default)
+        public static async Task<IList<Group>> GetGroupsAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, PagingInformation pagingInformation = null, CancellationToken cancellationToken = default)
         {
+            pagingInformation ??= new PagingInformation
+            {
+                Limit = 200,
+                Start = 0
+            };
             var groupUri = confluenceClient.ConfluenceApiUri
                 .AppendSegments("user", "memberof")
-                .ExtendQuery("accountId", accountIdHolder.AccountId);
+                .ExtendQuery(new Dictionary<string, object> {
+                    {
+                        "start", pagingInformation.Start
+                    },
+                    {
+                        "limit", pagingInformation.Limit
+                    },
+                    {
+                        "accountId", accountIdHolder.AccountId
+                    }
+                });
             confluenceClient.Behaviour.MakeCurrent();
             var response = await groupUri.GetAsAsync<HttpResponse<Result<Group>, Error>>(cancellationToken).ConfigureAwait(false);
             return response.HandleErrors()?.Results;
