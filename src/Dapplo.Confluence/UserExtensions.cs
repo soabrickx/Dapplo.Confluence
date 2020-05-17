@@ -65,6 +65,8 @@ namespace Dapplo.Confluence
         [Obsolete("Username is deprecated, see: https://developer.atlassian.com/cloud/confluence/deprecation-notice-user-privacy-api-migration-guide/")]
         public static async Task<User> GetUserAsync(this IUserDomain confluenceClient, string username, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(username)) throw new ArgumentNullException(nameof(username));
+
             var userUri = confluenceClient.ConfluenceApiUri
                 .AppendSegments("user")
                 .ExtendQuery("username", username);
@@ -83,6 +85,8 @@ namespace Dapplo.Confluence
         /// <returns>User</returns>
         public static async Task<User> GetUserAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, CancellationToken cancellationToken = default)
         {
+            if (accountIdHolder == null || string.IsNullOrEmpty(accountIdHolder.AccountId)) throw new ArgumentNullException(nameof(accountIdHolder));
+
             var userUri = confluenceClient.ConfluenceApiUri
                 .AppendSegments("user")
                 .ExtendQuery("accountId", accountIdHolder.AccountId);
@@ -100,8 +104,10 @@ namespace Dapplo.Confluence
         /// <param name="pagingInformation">PagingInformation</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>List with Groups</returns>
-        public static async Task<IList<Group>> GetGroupsAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, PagingInformation pagingInformation = null, CancellationToken cancellationToken = default)
+        public static async Task<IList<Group>> GetGroupMembershipsAsync(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, PagingInformation pagingInformation = null, CancellationToken cancellationToken = default)
         {
+            if (accountIdHolder == null || string.IsNullOrEmpty(accountIdHolder.AccountId)) throw new ArgumentNullException(nameof(accountIdHolder));
+
             pagingInformation ??= new PagingInformation
             {
                 Limit = 200,
@@ -123,6 +129,29 @@ namespace Dapplo.Confluence
             confluenceClient.Behaviour.MakeCurrent();
             var response = await groupUri.GetAsAsync<HttpResponse<Result<Group>, Error>>(cancellationToken).ConfigureAwait(false);
             return response.HandleErrors()?.Results;
+        }
+
+        /// <summary>
+        ///  Get groups for the specified user, introduced with 6.6
+        ///     See: https://developer.atlassian.com/cloud/confluence/rest/#api-api-user-memberof-get
+        /// </summary>
+        /// <param name="confluenceClient">IUserDomain to bind the extension method to</param>
+        /// <param name="accountIdHolder">IAccountIdHolder for the user (account id)</param>
+        /// <param name="contentId">string with the ID for the content</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>List with Groups</returns>
+        public static async Task AddContentWatcher(this IUserDomain confluenceClient, IAccountIdHolder accountIdHolder, string contentId, CancellationToken cancellationToken = default)
+        {
+            if (accountIdHolder == null || string.IsNullOrEmpty(accountIdHolder.AccountId)) throw new ArgumentNullException(nameof(accountIdHolder));
+            if (string.IsNullOrEmpty(contentId)) throw new ArgumentNullException(nameof(contentId));
+
+            var groupUri = confluenceClient.ConfluenceApiUri
+                .AppendSegments("user", "watch", "content", contentId)
+                .ExtendQuery("accountId", accountIdHolder.AccountId);
+
+            confluenceClient.Behaviour.MakeCurrent();
+            var response = await groupUri.PostAsync<HttpResponseWithError<Error>>(null, cancellationToken: cancellationToken).ConfigureAwait(false);
+            response.HandleStatusCode();
         }
     }
 }

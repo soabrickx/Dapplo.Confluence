@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+using System;
 using System.Net;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +40,9 @@ namespace Dapplo.Confluence
         /// <returns>Content</returns>
         public static Task<Content> CreateAsync(this IContentDomain confluenceClient, ContentTypes contentType, string title, string spaceKey, string body, long? ancestorId = null, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(title)) throw new ArgumentNullException(nameof(title));
+            if (string.IsNullOrEmpty(spaceKey)) throw new ArgumentNullException(nameof(spaceKey));
+            if (string.IsNullOrEmpty(body)) throw new ArgumentNullException(nameof(body));
             var contentBody = new Body
             {
                 Storage = new BodyContent
@@ -63,6 +67,10 @@ namespace Dapplo.Confluence
         /// <returns>Content</returns>
         public static Task<Content> CreateAsync(this IContentDomain confluenceClient, ContentTypes contentType, string title, string spaceKey, Body body, long? ancestorId = null, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(title)) throw new ArgumentNullException(nameof(title));
+            if (string.IsNullOrEmpty(spaceKey)) throw new ArgumentNullException(nameof(spaceKey));
+            if (body == null) throw new ArgumentNullException(nameof(body));
+
             var content = new Content
             {
                 Type = contentType,
@@ -92,6 +100,7 @@ namespace Dapplo.Confluence
         /// <returns>Content</returns>
         public static async Task<Content> CreateAsync(this IContentDomain confluenceClient, Content content, CancellationToken cancellationToken = default)
         {
+            if (content == null) throw new ArgumentNullException(nameof(content));
             var contentUri = confluenceClient.ConfluenceApiUri.AppendSegments("content");
 
             confluenceClient.Behaviour.MakeCurrent();
@@ -108,6 +117,7 @@ namespace Dapplo.Confluence
         /// <param name="cancellationToken">CancellationToken</param>
         public static async Task DeleteAsync(this IContentDomain confluenceClient, long contentId, bool isTrashed = false, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
             var contentUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId);
 
             if (isTrashed)
@@ -130,6 +140,7 @@ namespace Dapplo.Confluence
         /// <returns>Content</returns>
         public static async Task<Content> GetAsync(this IContentDomain confluenceClient, long contentId, IEnumerable<string> expandGetContent = null, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
             var contentUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId);
 
             var expand = string.Join(",", expandGetContent ?? ConfluenceClientConfig.ExpandGetContent ?? Enumerable.Empty<string>());
@@ -151,21 +162,27 @@ namespace Dapplo.Confluence
         /// <param name="confluenceClient">IContentDomain to bind the extension method to</param>
         /// <param name="spaceKey">Space key</param>
         /// <param name="title">Title of the content</param>
-        /// <param name="start">Start of the results, used for paging</param>
-        /// <param name="limit">Maximum number of results returned, default is 20</param>
+        /// <param name="pagingInformation">PagingInformation used for paging</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>Results with content items</returns>
-        public static async Task<Result<Content>> GetByTitleAsync(this IContentDomain confluenceClient, string spaceKey, string title, int start = 0, int limit = 20, CancellationToken cancellationToken = default)
+        public static async Task<Result<Content>> GetByTitleAsync(this IContentDomain confluenceClient, string spaceKey, string title, PagingInformation pagingInformation = null, CancellationToken cancellationToken = default)
         {
-            confluenceClient.Behaviour.MakeCurrent();
+            if (string.IsNullOrEmpty(title)) throw new ArgumentNullException(nameof(title));
+            if (string.IsNullOrEmpty(spaceKey)) throw new ArgumentNullException(nameof(spaceKey));
 
+            confluenceClient.Behaviour.MakeCurrent();
+            pagingInformation ??= new PagingInformation
+            {
+                Limit = 200,
+                Start = 0
+            };
             var searchUri = confluenceClient.ConfluenceApiUri.AppendSegments("content").ExtendQuery(new Dictionary<string, object>
             {
                 {
-                    "start", start
+                    "start", pagingInformation.Start
                 },
                 {
-                    "limit", limit
+                    "limit", pagingInformation.Limit
                 },
                 {
                     "type", "page"
@@ -199,6 +216,7 @@ namespace Dapplo.Confluence
         /// <returns>List with Content</returns>
         public static async Task<Result<Content>> GetChildrenAsync(this IContentDomain confluenceClient, long contentId, PagingInformation pagingInformation = null, int? parentVersion = null, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
             var contentUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId, "child", "page");
 
             if (pagingInformation?.Start != null)
@@ -236,6 +254,7 @@ namespace Dapplo.Confluence
         /// <returns>Content</returns>
         public static async Task<History> GetHistoryAsync(this IContentDomain confluenceClient, long contentId, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
             var historyUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId, "history");
 
             confluenceClient.Behaviour.MakeCurrent();
@@ -290,6 +309,8 @@ namespace Dapplo.Confluence
         /// <returns>Result with content items</returns>
         public static async Task<Result<Content>> SearchAsync(this IContentDomain confluenceClient, SearchDetails searchDetails, CancellationToken cancellationToken = default)
         {
+            if (searchDetails == null) throw new ArgumentNullException(nameof(searchDetails));
+
             confluenceClient.Behaviour.MakeCurrent();
 
             var searchUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", "search").ExtendQuery("cql", searchDetails.Cql);
@@ -327,6 +348,7 @@ namespace Dapplo.Confluence
         /// <returns>Content</returns>
         public static async Task<Content> UpdateAsync(this IContentDomain confluenceClient, Content content, CancellationToken cancellationToken = default)
         {
+            if (content == null) throw new ArgumentNullException(nameof(content));
             var contentUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", content.Id);
 
             confluenceClient.Behaviour.MakeCurrent();
@@ -343,6 +365,7 @@ namespace Dapplo.Confluence
         /// <returns>Result with labels</returns>
         public static async Task<Result<Label>> GetLabelsAsync(this IContentDomain confluenceClient, long contentId, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
             var labelUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId, "label");
             confluenceClient.Behaviour.MakeCurrent();
 
@@ -360,6 +383,8 @@ namespace Dapplo.Confluence
         /// <returns>Task</returns>
         public static async Task AddLabelsAsync(this IContentDomain confluenceClient, long contentId, IEnumerable<Label> labels, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
+            if (labels == null || !labels.Any()) throw new ArgumentNullException(nameof(labels));
             var labelUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId, "label");
             confluenceClient.Behaviour.MakeCurrent();
 
@@ -377,6 +402,9 @@ namespace Dapplo.Confluence
         /// <returns>Task</returns>
         public static async Task DeleteLabelAsync(this IContentDomain confluenceClient, long contentId, string label, CancellationToken cancellationToken = default)
         {
+            if (contentId == 0) throw new ArgumentNullException(nameof(contentId));
+            if (string.IsNullOrEmpty(label)) throw new ArgumentNullException(nameof(label));
+
             var labelUri = confluenceClient.ConfluenceApiUri.AppendSegments("content", contentId, "label", label);
             confluenceClient.Behaviour.MakeCurrent();
 

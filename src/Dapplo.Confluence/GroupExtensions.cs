@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,6 +61,8 @@ namespace Dapplo.Confluence
         /// <returns>List with Users</returns>
         public static async Task<IEnumerable<User>> GetGroupMembersAsync(this IGroupDomain confluenceClient, string groupName, PagingInformation pagingInformation = null, CancellationToken cancellationToken = default)
         {
+            if (string.IsNullOrEmpty(groupName)) throw new ArgumentNullException(nameof(groupName));
+
             pagingInformation ??= new PagingInformation
             {
                 Limit = 200,
