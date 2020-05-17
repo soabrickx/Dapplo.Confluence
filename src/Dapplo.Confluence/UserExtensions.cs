@@ -295,7 +295,7 @@ namespace Dapplo.Confluence
 
             confluenceClient.Behaviour.MakeCurrent();
             var response = await userWatchLabelUri.GetAsAsync<HttpResponse<UserWatch>>(cancellationToken).ConfigureAwait(false);
-            return response.HandleErrors().IsWatching;
+            return response.HandleErrors(HttpStatusCode.OK, HttpStatusCode.NotFound)?.IsWatching ?? false;
         }
 
         /// <summary>
