@@ -9,12 +9,12 @@ using Xunit.Abstractions;
 namespace Dapplo.Confluence.Tests
 {
     /// <summary>
-    ///     Tests
+    ///     Tests for group related functionality
     /// </summary>
     [CollectionDefinition("Dapplo.Confluence")]
-    public class GroupDomainTests : ConfluenceIntegrationTests
+    public class GroupTests : ConfluenceIntegrationTests
     {
-        public GroupDomainTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+        public GroupTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
         {
         }
 

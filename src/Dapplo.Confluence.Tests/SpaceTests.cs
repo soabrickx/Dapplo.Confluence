@@ -40,7 +40,6 @@ namespace Dapplo.Confluence.Tests
             Assert.True(spaces.Count > 0);
         }
 
-
         /// <summary>
         ///     Test GetContentsAsync
         /// </summary>
