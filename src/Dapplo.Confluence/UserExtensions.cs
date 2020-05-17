@@ -293,13 +293,10 @@ namespace Dapplo.Confluence
                 userWatchLabelUri = userWatchLabelUri.ExtendQuery("accountId", accountIdHolder.AccountId);
             }
 
-            // Skip throwing on error, this is needed due to the fact that a unknown label returns a 403 (forbidden)
-            var behavior = confluenceClient.Behaviour.ShallowClone();
-            behavior.ThrowOnError = false;
-            behavior.MakeCurrent();
-
+            confluenceClient.Behaviour.MakeCurrent();
+            
             var response = await userWatchLabelUri.GetAsAsync<HttpResponse<UserWatch>>(cancellationToken).ConfigureAwait(false);
-            return response.HandleErrors(HttpStatusCode.OK, HttpStatusCode.Forbidden)?.IsWatching ?? false;
+            return response.HandleErrors(HttpStatusCode.OK)?.IsWatching ?? false;
         }
 
         /// <summary>

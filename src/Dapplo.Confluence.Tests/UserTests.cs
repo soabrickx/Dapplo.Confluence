@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Dapplo and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using Dapplo.Confluence.Entities;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -65,14 +67,32 @@ namespace Dapplo.Confluence.Tests
         public async Task TestLabelWatcher()
         {
             const string testLabel = "Dappl0";
-            Assert.False(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
+            long contentId = 550731777;
 
-            // Add the current user as a label watcher
-            await ConfluenceTestClient.User.AddLabelWatcher(testLabel);
-            Assert.True(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
+            var label = new Label
+            {
+                Name = testLabel
+            };
 
-            await ConfluenceTestClient.User.DeleteLabelWatcher(testLabel);
-            Assert.False(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
+            // Make sure there is a label
+            await ConfluenceTestClient.Content.AddLabelsAsync(contentId, Enumerable.Repeat<Label>(label, 1));
+
+            try
+            {
+                Assert.False(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
+
+                // Add the current user as a label watcher
+                await ConfluenceTestClient.User.AddLabelWatcher(testLabel);
+                Assert.True(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
+
+                await ConfluenceTestClient.User.DeleteLabelWatcher(testLabel);
+                Assert.False(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
+            }
+            finally
+            {
+                // Make sure the label is removed again
+                await ConfluenceTestClient.Content.DeleteLabelAsync(contentId, testLabel);
+            }
         }
 
         /// <summary>
