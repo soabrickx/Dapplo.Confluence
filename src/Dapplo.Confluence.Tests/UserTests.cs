@@ -67,7 +67,7 @@ namespace Dapplo.Confluence.Tests
         public async Task TestLabelWatcher()
         {
             const string testLabel = "Dappl0";
-            long contentId = 550731777;
+            const long contentId = 550731777;
 
             var label = new Label
             {
@@ -75,7 +75,7 @@ namespace Dapplo.Confluence.Tests
             };
 
             // Make sure there is a label
-            await ConfluenceTestClient.Content.AddLabelsAsync(contentId, Enumerable.Repeat<Label>(label, 1));
+            await ConfluenceTestClient.Content.AddLabelsAsync(contentId, Enumerable.Repeat(label, 1));
 
             try
             {

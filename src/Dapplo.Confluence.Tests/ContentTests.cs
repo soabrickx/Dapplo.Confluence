@@ -4,7 +4,6 @@
 
 using System.Drawing;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Dapplo.Confluence.Entities;
 using Dapplo.Confluence.Query;

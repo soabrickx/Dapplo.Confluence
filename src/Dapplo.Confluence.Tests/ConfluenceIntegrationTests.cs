@@ -14,18 +14,17 @@ namespace Dapplo.Confluence.Tests
     /// </summary>
     public abstract class ConfluenceIntegrationTests
     {
-
         // Test against a "well known" Confluence
         private static readonly Uri TestConfluenceUri = new Uri("https://greenshot.atlassian.net/wiki");
 
         protected readonly IConfluenceClient ConfluenceTestClient;
 
-        public ConfluenceIntegrationTests(ITestOutputHelper testOutputHelper)
+        protected ConfluenceIntegrationTests(ITestOutputHelper testOutputHelper)
         {
             LogSettings.ExceptionToStacktrace = exception => exception.ToStringDemystified();
 
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
-            ConfluenceTestClient = Confluence.ConfluenceClient.Create(TestConfluenceUri);
+            ConfluenceTestClient = ConfluenceClient.Create(TestConfluenceUri);
 
             var username = Environment.GetEnvironmentVariable("confluence_test_username");
             var password = Environment.GetEnvironmentVariable("confluence_test_password");

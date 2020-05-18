@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Dapplo.Confluence.Entities;
 using Dapplo.HttpExtensions;
 using Dapplo.Confluence.Internals;
-using Enumerable = System.Linq.Enumerable;
+using System.Linq;
 
 namespace Dapplo.Confluence
 {
