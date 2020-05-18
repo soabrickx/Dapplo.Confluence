@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Dapplo.Confluence.Entities;
 using Dapplo.HttpExtensions;
 using Dapplo.Confluence.Internals;
-using Enumerable = System.Linq.Enumerable;
+using System.Linq;
 
 namespace Dapplo.Confluence
 {
@@ -117,12 +117,11 @@ namespace Dapplo.Confluence
         /// <param name="type">string filter the list of spaces returned by type (global, personal)</param>
         /// <param name="status">string filter the list of spaces returned by status (current, archived)</param>
         /// <param name="label">string filter the list of spaces returned by label</param>
-        /// <param name="favourite">bool filter the list of spaces returned by favourites</param>
-        /// <param name="start">the start point of the collection to return</param>
-        /// <param name="limit">The maximum number of spaces to return per page. System default is 25, override this with a value. Note, this may be restricted by fixed system limits.</param>
+        /// <param name="favourite">bool filter the list of spaces returned by favorites</param>
+        /// <param name="pagingInformation">PagingInformation</param>
         /// <param name="cancellationToken">CancellationToken</param>
         /// <returns>List of Spaces</returns>
-        public static async Task<IList<Space>> GetAllWithParametersAsync(this ISpaceDomain confluenceClient, IEnumerable<string> spaceKeys = null, string type = null, string status = null, string label = null, bool? favourite = null, int? start = null, int? limit = null, CancellationToken cancellationToken = default)
+        public static async Task<IList<Space>> GetAllWithParametersAsync(this ISpaceDomain confluenceClient, IEnumerable<string> spaceKeys = null, string type = null, string status = null, string label = null, bool? favourite = null, PagingInformation pagingInformation = null, CancellationToken cancellationToken = default)
         {
             confluenceClient.Behaviour.MakeCurrent();
             var spacesUri = confluenceClient.ConfluenceApiUri.AppendSegments("space");
@@ -153,13 +152,13 @@ namespace Dapplo.Confluence
             {
                 spacesUri = spacesUri.ExtendQuery("expand", expand);
             }
-            if (start.HasValue)
+            if (pagingInformation?.Start != null)
             {
-                spacesUri = spacesUri.ExtendQuery("start", start.Value);
+                spacesUri = spacesUri.ExtendQuery("start", pagingInformation.Start.Value);
             }
-            if (limit.HasValue)
+            if (pagingInformation?.Limit != null)
             {
-                spacesUri = spacesUri.ExtendQuery("limit", limit.Value);
+                spacesUri = spacesUri.ExtendQuery("limit", pagingInformation.Limit.Value);
             }
 
             var response = await spacesUri.GetAsAsync<HttpResponse<Result<Space>, Error>>(cancellationToken).ConfigureAwait(false);

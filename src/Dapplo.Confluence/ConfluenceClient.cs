@@ -22,7 +22,7 @@ namespace Dapplo.Confluence
     /// <summary>
     ///     A Confluence client build by using Dapplo.HttpExtensions
     /// </summary>
-    public class ConfluenceClient : IConfluenceClientPlugins, IAttachmentDomain, IUserDomain, ISpaceDomain, IContentDomain, IMiscDomain
+    public class ConfluenceClient : IConfluenceClientPlugins, IAttachmentDomain, IUserDomain, ISpaceDomain, IContentDomain, IMiscDomain, IGroupDomain
     {
         /// <summary>
         ///     Password for the basic authentication
@@ -91,13 +91,16 @@ namespace Dapplo.Confluence
         public IContentDomain Content => this;
 
         /// <inheritdoc />
-        public IUserDomain User => this;
+        public IGroupDomain Group => this;
+
+        /// <inheritdoc />
+        public IMiscDomain Misc => this;
 
         /// <inheritdoc />
         public ISpaceDomain Space => this;
 
         /// <inheritdoc />
-        public IMiscDomain Misc => this;
+        public IUserDomain User => this;
 
         /// <inheritdoc />
         public Uri CreateWebUiUri(Links links)

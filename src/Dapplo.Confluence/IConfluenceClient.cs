@@ -33,7 +33,17 @@ namespace Dapplo.Confluence
 		/// </summary>
 		IContentDomain Content { get; }
 
-		/// <summary>
+        /// <summary>
+        ///     The group domain
+        /// </summary>
+        IGroupDomain Group { get; }
+
+        /// <summary>
+		///     The misc domain
+		/// </summary>
+		IMiscDomain Misc { get; }
+
+        /// <summary>
 		///     Extensions of the client dock to this property, so typing "confluenceClient.Plugins." should show your extension.
 		/// </summary>
 		IConfluenceClientPlugins Plugins { get; }
@@ -47,11 +57,6 @@ namespace Dapplo.Confluence
 		///     The user domain
 		/// </summary>
 		IUserDomain User { get; }
-
-		/// <summary>
-		///     The misc domain
-		/// </summary>
-		IMiscDomain Misc { get; }
 
 		/// <summary>
 		///     Retrieve the Download as Uri from the supplied links object
