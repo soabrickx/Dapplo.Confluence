@@ -58,7 +58,7 @@ namespace Dapplo.Confluence
         public static async Task<SystemInfoEntity> GetSystemInfoAsync(this IMiscDomain confluenceClient, CancellationToken cancellationToken = default)
         {
             var systemInfoUri = confluenceClient.ConfluenceApiUri
-                .AppendSegments("settings", "systeminfo");
+                .AppendSegments("settings", "systemInfo");
 
             confluenceClient.Behaviour.MakeCurrent();
             var response = await systemInfoUri.GetAsAsync<HttpResponse<SystemInfoEntity>>(cancellationToken).ConfigureAwait(false);
