@@ -31,6 +31,9 @@ namespace Dapplo.Confluence.Tests
             Assert.NotNull(currentUser.AccountId);
             Assert.NotNull(currentUser.ProfilePicture);
             Assert.DoesNotContain("Anonymous", currentUser.DisplayName);
+
+            var currentUserIndirectly = await ConfluenceTestClient.User.GetUserAsync(currentUser);
+            Assert.Equal(currentUser.DisplayName, currentUserIndirectly.DisplayName);
         }
 
         /// <summary>
@@ -125,7 +128,7 @@ namespace Dapplo.Confluence.Tests
             await ConfluenceTestClient.User.AddContentWatcher(contentId);
             Assert.True(await ConfluenceTestClient.User.IsContentWatcher(contentId));
 
-            await ConfluenceTestClient.User.DeleteContentWatcher(contentId);
+            await ConfluenceTestClient.User.RemoveContentWatcher(contentId);
             Assert.False(await ConfluenceTestClient.User.IsContentWatcher(contentId));
         }
     }

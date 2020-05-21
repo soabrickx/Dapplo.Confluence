@@ -12,7 +12,7 @@ namespace Dapplo.Confluence.Entities
     ///     See: https://docs.atlassian.com/confluence/REST/latest
     /// </summary>
     [JsonObject]
-    public class User : IAccountIdHolder
+    public class User : IUserIdentifier
     {
         /// <summary>
         ///     The name which is displayed in the UI, usually "firstname lastname"
@@ -52,17 +52,15 @@ namespace Dapplo.Confluence.Entities
         public string AccountType { get; set; }
 
         /// <summary>
-        ///     This property is no longer available and will be removed from the documentation soon. Use accountId instead.
+        ///     For Confluence Cloud: This property is no longer available and will be removed from the documentation soon. Use accountId instead.
         /// </summary>
         [JsonProperty("userKey", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Obsolete("UserKey is deprecated, see: https://developer.atlassian.com/cloud/confluence/deprecation-notice-user-privacy-api-migration-guide/")]
         public string UserKey { get; set; }
 
         /// <summary>
-        ///     This property is no longer available and will be removed from the documentation soon. Use accountId instead.
+        ///     For Confluence Cloud: This property is no longer available and will be removed from the documentation soon. Use accountId instead.
         /// </summary>
         [JsonProperty("username", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        [Obsolete("Username is deprecated, see: https://developer.atlassian.com/cloud/confluence/deprecation-notice-user-privacy-api-migration-guide/")]
         public string Username { get; set; }
 
         /// <summary>
@@ -71,7 +69,7 @@ namespace Dapplo.Confluence.Entities
         [JsonProperty("personalSpace", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Space PersonalSpace { get; set; }
 
-        /// <inheritdoc cref="IAccountIdHolder" />
+        /// <inheritdoc cref="IUserIdentifier" />
         [JsonProperty("accountId")]
         public string AccountId { get; set; }
     }

@@ -3,6 +3,7 @@
 
 
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Dapplo.Confluence.Entities;
@@ -45,6 +46,23 @@ namespace Dapplo.Confluence
             var pictureUri = new Uri(pictureUriBuilder.Uri.AbsoluteUri.TrimEnd('/') + picture.Path);
             var response = await pictureUri.GetAsAsync<HttpResponse<TResponse, string>>(cancellationToken).ConfigureAwait(false);
             return response.HandleErrors();
+        }
+
+        /// <summary>
+        /// Returns the system information for the Confluence Cloud tenant.
+        /// This only works on the cloud version of Confluence.
+        /// </summary>
+        /// <param name="confluenceClient">IMiscDomain</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns>SystemInfoEntity</returns>
+        public static async Task<SystemInfoEntity> GetSystemInfoAsync(this IMiscDomain confluenceClient, CancellationToken cancellationToken = default)
+        {
+            var systemInfoUri = confluenceClient.ConfluenceApiUri
+                .AppendSegments("settings", "systeminfo");
+
+            confluenceClient.Behaviour.MakeCurrent();
+            var response = await systemInfoUri.GetAsAsync<HttpResponse<SystemInfoEntity>>(cancellationToken).ConfigureAwait(false);
+            return response.HandleErrors(HttpStatusCode.OK, HttpStatusCode.NotFound);
         }
     }
 }

@@ -3,6 +3,8 @@
 
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Dapplo.Confluence.Entities;
 using Dapplo.HttpExtensions;
 
@@ -85,7 +87,14 @@ namespace Dapplo.Confluence
 		/// <param name="user">string with the confluence user</param>
 		/// <param name="password">string with the password for the confluence user</param>
 		void SetBasicAuthentication(string user, string password);
-	}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="cancellationToken"></param>
+		/// <returns>bool</returns>
+        Task<bool> IsCloudServer(CancellationToken cancellationToken = default);
+    }
 
 	/// <summary>
 	///     Interface of all the confluence domain interfaces
