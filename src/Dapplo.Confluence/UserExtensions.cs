@@ -170,21 +170,20 @@ namespace Dapplo.Confluence
                 .AppendSegments(segments);
 
             // If there is no specified accountId, the current user is used
-            if (userIdentifier != null)
+            if (userIdentifier == null) return userWatchContentUri;
+            
+            if (isCloudServer)
             {
-                if (isCloudServer)
-                {
-                    // Check the account id value.
-                    if (string.IsNullOrEmpty(userIdentifier.AccountId)) throw new ArgumentNullException(nameof(userIdentifier), "It seems that there is no account ID supplied.");
-                    userWatchContentUri = userWatchContentUri.ExtendQuery("accountId", userIdentifier.AccountId);
-                }
-                else
-                {
-                    // Check the account id value.
-                    if (string.IsNullOrEmpty(userIdentifier.AccountId)) throw new ArgumentNullException(nameof(userIdentifier), "It seems that there is no account ID supplied.");
+                // Check the account id value.
+                if (string.IsNullOrEmpty(userIdentifier.AccountId)) throw new ArgumentNullException(nameof(userIdentifier), "It seems that there is no account ID supplied.");
+                userWatchContentUri = userWatchContentUri.ExtendQuery("accountId", userIdentifier.AccountId);
+            }
+            else
+            {
+                // Check the username value.
+                if (string.IsNullOrEmpty(userIdentifier.Username)) throw new ArgumentNullException(nameof(userIdentifier), "It seems that there is no username supplied.");
 
-                    userWatchContentUri = userWatchContentUri.ExtendQuery("username", userIdentifier.Username);
-                }
+                userWatchContentUri = userWatchContentUri.ExtendQuery("username", userIdentifier.Username);
             }
 
             return userWatchContentUri;
