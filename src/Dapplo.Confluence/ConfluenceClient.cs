@@ -26,7 +26,7 @@ namespace Dapplo.Confluence
     /// </summary>
     public class ConfluenceClient : IConfluenceClientPlugins, IAttachmentDomain, IUserDomain, ISpaceDomain, IContentDomain, IMiscDomain, IGroupDomain
     {
-        private bool? _isCloudServer;
+        private Task<bool> _isCloudServer;
 
         /// <summary>
         ///     Password for the basic authentication
@@ -214,16 +214,10 @@ namespace Dapplo.Confluence
         /// <returns>bool</returns>
         public Task<bool> IsCloudServer(CancellationToken cancellationToken = default)
         {
-            if (_isCloudServer.HasValue)
-            {
-                return Task.FromResult(_isCloudServer.Value);
-            }
-            return Task.Run(async () => {
+            return _isCloudServer ??= Task.Run(async () => {
                 var systemInfo = await this.Misc.GetSystemInfoAsync(cancellationToken);
-                _isCloudServer =!string.IsNullOrEmpty(systemInfo?.CloudId);
-                return _isCloudServer.Value;
+                return !string.IsNullOrEmpty(systemInfo?.CloudId);
             }, cancellationToken);
-            
         }
          
         /// <summary>

@@ -60,7 +60,11 @@ namespace Dapplo.Confluence
             var systemInfoUri = confluenceClient.ConfluenceApiUri
                 .AppendSegments("settings", "systemInfo");
 
-            confluenceClient.Behaviour.MakeCurrent();
+            // Special error handling
+            var behaviour = confluenceClient.Behaviour.ShallowClone();
+            behaviour.ThrowOnError = false;
+            behaviour.MakeCurrent();
+
             var response = await systemInfoUri.GetAsAsync<HttpResponse<SystemInfoEntity>>(cancellationToken).ConfigureAwait(false);
             return response.HandleErrors(HttpStatusCode.OK, HttpStatusCode.NotFound);
         }

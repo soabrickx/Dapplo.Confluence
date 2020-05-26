@@ -28,7 +28,7 @@ namespace Dapplo.Confluence.Tests
         {
             var currentUser = await ConfluenceTestClient.User.GetCurrentUserAsync();
             Assert.NotNull(currentUser);
-            Assert.NotNull(currentUser.AccountId);
+            Assert.True(currentUser.HasIdentifier());
             Assert.NotNull(currentUser.ProfilePicture);
             Assert.DoesNotContain("Anonymous", currentUser.DisplayName);
 
