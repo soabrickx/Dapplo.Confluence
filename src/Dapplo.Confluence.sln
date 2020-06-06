@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence", "Dapplo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence.Tests", "Dapplo.Confluence.Tests\Dapplo.Confluence.Tests.csproj", "{2119C12B-5874-4E60-BD36-45CA1D29FDDC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence.OAuth", "Dapplo.Confluence.OAuth\Dapplo.Confluence.OAuth.csproj", "{02980BD0-F615-498C-8478-7E033394005F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2119C12B-5874-4E60-BD36-45CA1D29FDDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2119C12B-5874-4E60-BD36-45CA1D29FDDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2119C12B-5874-4E60-BD36-45CA1D29FDDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02980BD0-F615-498C-8478-7E033394005F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02980BD0-F615-498C-8478-7E033394005F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02980BD0-F615-498C-8478-7E033394005F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02980BD0-F615-498C-8478-7E033394005F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,6 +31,11 @@ namespace Dapplo.Confluence
 		public static string[] ExpandGetContent { get; set; } = { "body", "body.view", "version" };
 
 		/// <summary>
+		///     The values that are expanded in the GetContent result, but for an update use case
+		/// </summary>
+		public static string[] ExpandGetContentForUpdate { get; set; } = { "body.storage", "version" };
+
+		/// <summary>
 		///     The values that are expanded in the GetContentByTitle results
 		/// </summary>
 		public static string[] ExpandGetContentByTitle { get; set; }

@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,6 +53,20 @@ namespace Dapplo.Confluence.Tests
             Assert.NotNull(content.Version);
             Assert.NotNull(content.Ancestors);
             Assert.True(content.Ancestors.Count > 0);
+        }
+
+        /// <summary>
+        ///     Test UpdateAsync
+        /// </summary>
+        [Fact]
+        public async Task TestContentUpdate()
+        {
+            var content = await ConfluenceTestClient.Content.GetAsync(950274, ConfluenceClientConfig.ExpandGetContentForUpdate);
+            Assert.NotNull(content);
+            Assert.NotNull(content.Version);
+            content.Body.Storage.Value += $"\r\nTesting 1 - 2 -3 {DateTimeOffset.Now}";
+            content.Version = new Entities.Version { IsMinorEdit = false, Number = content.Version.Number + 1 };
+            await ConfluenceTestClient.Content.UpdateAsync(content);
         }
 
         /// <summary>

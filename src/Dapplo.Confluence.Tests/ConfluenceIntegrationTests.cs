@@ -15,7 +15,7 @@ namespace Dapplo.Confluence.Tests
     public abstract class ConfluenceIntegrationTests
     {
         // Test against a "well known" Confluence
-        private static readonly Uri TestConfluenceUri = new Uri("https://greenshot.atlassian.net/wiki");
+        private static readonly Uri TestConfluenceUri = new Uri("http://n40l.fritz.box:8090");
 
         protected readonly IConfluenceClient ConfluenceTestClient;
 
@@ -26,8 +26,8 @@ namespace Dapplo.Confluence.Tests
             LogSettings.RegisterDefaultLogger<XUnitLogger>(LogLevels.Verbose, testOutputHelper);
             ConfluenceTestClient = ConfluenceClient.Create(TestConfluenceUri);
 
-            var username = Environment.GetEnvironmentVariable("confluence_test_username");
-            var password = Environment.GetEnvironmentVariable("confluence_test_password");
+            var username = "dapplounittests";
+            var password = "DapploUnitTests";
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 ConfluenceTestClient.SetBasicAuthentication(username, password);

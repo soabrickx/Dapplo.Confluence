@@ -5,12 +5,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-#if NET471 || NET461 || NETCOREAPP3_0
-using Dapplo.HttpExtensions.OAuth;
-using System.Collections.Generic;
-using System.Net.Http;
-using Dapplo.HttpExtensions.Extensions;
-#endif
 #if NET471 || NET461
 using System.Net.Cache;
 #endif
@@ -39,11 +33,19 @@ namespace Dapplo.Confluence
         private string _user;
 
         /// <summary>
+        /// 
+        /// </summary>
+        protected ConfluenceClient()
+        {
+
+        }
+
+        /// <summary>
         ///     Create the ConfluenceApi object, here the HttpClient is configured
         /// </summary>
         /// <param name="confluenceUri">Base URL, e.g. https://yourConfluenceserver</param>
         /// <param name="httpSettings">IHttpSettings or null for default</param>
-        private ConfluenceClient(Uri confluenceUri, IHttpSettings httpSettings = null)
+        protected ConfluenceClient(Uri confluenceUri, IHttpSettings httpSettings = null)
         {
             ConfluenceUri = confluenceUri ?? throw new ArgumentNullException(nameof(confluenceUri));
             ConfluenceApiUri = confluenceUri.AppendSegments("rest", "api");
@@ -231,48 +233,6 @@ namespace Dapplo.Confluence
             result.Settings.DateFormatString = result.Settings.DateFormatString.Replace("FFFFFF", "ff");
             return result;
         }
-
-#if NET471 || NET461 ||NETCOREAPP3_0
-        /// <summary>
-        ///     Create the IConfluenceClient, using OAuth 1 for the communication, here the HttpClient is configured
-        /// </summary>
-        /// <param name="baseUri">Base URL, e.g. https://yourconfluenceserver</param>
-        /// <param name="confluenceOAuthSettings">ConfluenceOAuthSettings</param>
-        /// <param name="httpSettings">IHttpSettings or null for default</param>
-        public static IConfluenceClient Create(Uri baseUri, ConfluenceOAuthSettings confluenceOAuthSettings, IHttpSettings httpSettings = null)
-        {
-            var client = new ConfluenceClient(baseUri, httpSettings);
-            var confluenceOAuthUri = client.ConfluenceUri.AppendSegments("plugins", "servlet", "oauth");
-
-            var oAuthSettings = new OAuth1Settings
-            {
-                TokenUrl = confluenceOAuthUri.AppendSegments("request-token"),
-                TokenMethod = HttpMethod.Post,
-                AccessTokenUrl = confluenceOAuthUri.AppendSegments("access-token"),
-                AccessTokenMethod = HttpMethod.Post,
-                CheckVerifier = false,
-                SignatureType = OAuth1SignatureTypes.RsaSha1,
-                // According to <a href="https://community.atlassian.com/t5/Questions/Confluence-Oauth-Authentication/qaq-p/331326#M51385">here</a>
-                // the OAuth arguments need to be passed in the query
-                SignatureTransport = OAuth1SignatureTransports.QueryParameters,
-                Token = confluenceOAuthSettings.Token,
-                ClientId = confluenceOAuthSettings.ConsumerKey,
-                CloudServiceName = confluenceOAuthSettings.CloudServiceName,
-                RsaSha1Provider = confluenceOAuthSettings.RsaSha1Provider,
-                AuthorizeMode = confluenceOAuthSettings.AuthorizeMode,
-                AuthorizationUri = confluenceOAuthUri.AppendSegments("authorize")
-                    .ExtendQuery(new Dictionary<string, string>
-                    {
-                        {OAuth1Parameters.Token.EnumValueOf(), "{RequestToken}"},
-                        {OAuth1Parameters.Callback.EnumValueOf(), "{RedirectUrl}"}
-                    })
-            };
-
-            // Configure the OAuth1Settings
-            client.Behaviour = client.ConfigureBehaviour(OAuth1HttpBehaviourFactory.Create(oAuthSettings), httpSettings);
-            return client;
-        }
-#endif
 
         /// <summary>
         ///     Factory method to create a ConfluenceClient
