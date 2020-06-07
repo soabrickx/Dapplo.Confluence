@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence", "Dapplo.Confluence\Dapplo.Confluence.csproj", "{9E5111D5-7572-4643-937E-80D59B62B9F7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence.Tests", "Dapplo.Confluence.Tests\Dapplo.Confluence.Tests.csproj", "{2119C12B-5874-4E60-BD36-45CA1D29FDDC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence.OAuth", "Dapplo.Confluence.OAuth\Dapplo.Confluence.OAuth.csproj", "{02980BD0-F615-498C-8478-7E033394005F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dapplo.Confluence.Tests", "Dapplo.Confluence.Tests\Dapplo.Confluence.Tests.csproj", "{2119C12B-5874-4E60-BD36-45CA1D29FDDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
