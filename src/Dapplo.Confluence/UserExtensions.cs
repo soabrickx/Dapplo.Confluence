@@ -298,7 +298,7 @@ namespace Dapplo.Confluence
         /// <param name="label">string with the label</param>
         /// <param name="userIdentifier">IUserIdentifier for the user (account id), null for the current user</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        public static async Task DeleteLabelWatcher(this IUserDomain confluenceClient, string label, IUserIdentifier userIdentifier = null, CancellationToken cancellationToken = default)
+        public static async Task RemoveLabelWatcher(this IUserDomain confluenceClient, string label, IUserIdentifier userIdentifier = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(label)) throw new ArgumentNullException(nameof(label));
 
@@ -380,7 +380,7 @@ namespace Dapplo.Confluence
         /// <param name="spaceKey">string with the space key</param>
         /// <param name="userIdentifier">IUserIdentifier for the user (account id), null for the current user</param>
         /// <param name="cancellationToken">CancellationToken</param>
-        public static async Task DeleteSpaceWatcher(this IUserDomain confluenceClient, string spaceKey, IUserIdentifier userIdentifier = null, CancellationToken cancellationToken = default)
+        public static async Task RemoveSpaceWatcher(this IUserDomain confluenceClient, string spaceKey, IUserIdentifier userIdentifier = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(spaceKey)) throw new ArgumentNullException(nameof(spaceKey));
 

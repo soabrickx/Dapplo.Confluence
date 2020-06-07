@@ -82,13 +82,17 @@ namespace Dapplo.Confluence.Tests
 
             try
             {
+                if (await ConfluenceTestClient.User.IsLabelWatcher(testLabel))
+                {
+                    await ConfluenceTestClient.User.RemoveLabelWatcher(testLabel);
+                }
                 Assert.False(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
 
                 // Add the current user as a label watcher
                 await ConfluenceTestClient.User.AddLabelWatcher(testLabel);
                 Assert.True(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
 
-                await ConfluenceTestClient.User.DeleteLabelWatcher(testLabel);
+                await ConfluenceTestClient.User.RemoveLabelWatcher(testLabel);
                 Assert.False(await ConfluenceTestClient.User.IsLabelWatcher(testLabel));
             }
             finally
@@ -105,13 +109,18 @@ namespace Dapplo.Confluence.Tests
         public async Task TestSpaceWatcher()
         {
             string testSpace = "TEST";
+
+            if (await ConfluenceTestClient.User.IsSpaceWatcher(testSpace))
+            {
+                await ConfluenceTestClient.User.RemoveSpaceWatcher(testSpace);
+            }
             Assert.False(await ConfluenceTestClient.User.IsSpaceWatcher(testSpace));
 
             // Add the current user as a space watcher
             await ConfluenceTestClient.User.AddSpaceWatcher(testSpace);
             Assert.True(await ConfluenceTestClient.User.IsSpaceWatcher(testSpace));
 
-            await ConfluenceTestClient.User.DeleteSpaceWatcher(testSpace);
+            await ConfluenceTestClient.User.RemoveSpaceWatcher(testSpace);
             Assert.False(await ConfluenceTestClient.User.IsSpaceWatcher(testSpace));
         }
 
@@ -122,6 +131,10 @@ namespace Dapplo.Confluence.Tests
         public async Task TestContentWatcher()
         {
             long contentId = 550731777;
+            if (await ConfluenceTestClient.User.IsContentWatcher(contentId))
+            {
+                await ConfluenceTestClient.User.RemoveContentWatcher(contentId);
+            }
             Assert.False(await ConfluenceTestClient.User.IsContentWatcher(contentId));
 
             // Add the current user as a content watcher
