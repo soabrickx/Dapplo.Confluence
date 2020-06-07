@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>A library for accessing Atlassians Confluence from .NET</Description>
-    <AssemblyTitle>Dapplo.Confluence</AssemblyTitle>
+    <Description>A library for accessing Atlassians Confluence from .NET via OAuth</Description>
+    <AssemblyTitle>Dapplo.Confluence.OAuth</AssemblyTitle>
     <TargetFrameworks>net471;net461;netcoreapp3.0</TargetFrameworks>
-    <AssemblyName>Dapplo.Confluence</AssemblyName>
-    <PackageId>Dapplo.Confluence</PackageId>
+    <AssemblyName>Dapplo.Confluence.OAuth</AssemblyName>
+    <PackageId>Dapplo.Confluence.OAuth</PackageId>
     <PackageTags>atlassian;confluence;dapplo</PackageTags>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net461'">
