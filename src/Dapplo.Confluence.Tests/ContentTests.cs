@@ -61,7 +61,7 @@ namespace Dapplo.Confluence.Tests
         [Fact]
         public async Task TestContentUpdate()
         {
-            var content = await ConfluenceTestClient.Content.GetAsync(950274, ConfluenceClientConfig.ExpandGetContentForUpdate);
+            var content = await ConfluenceTestClient.Content.GetAsync(550731777, ConfluenceClientConfig.ExpandGetContentForUpdate);
             Assert.NotNull(content);
             Assert.NotNull(content.Version);
             content.Body.Storage.Value += $"\r\nTesting 1 - 2 -3 {DateTimeOffset.Now}";
